@@ -1,14 +1,26 @@
 #include <string>
 #include <iostream>
 
-using namespace std;
+#include "lexer.h"
+
 
 int main() {
    
-    string line;
+    std::string line;
 
-    while (getline(cin, line)) {
-        cout << line << " " << "sucks." << endl;
+    std::cout << "Lambda calculus interpreter. ^D to exit." << std::endl;
+
+    while (getline(std::cin, line)) {
+        Lexer l(line);
+        enum token t;
+
+        while ((t = l.next()) != t_eol) {
+            std::cout << token_string(t);
+            if (t == t_ident) std::cout << "(" << l.identifier() << ")";
+            std::cout << " ";
+        }
+
+        std::cout << std::endl;
     }
 
     return 0;
