@@ -1,11 +1,14 @@
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
+#include <string>
 
 using namespace std;
 
-class NameList {
+class Environment {
     private:
         vector<string> names;
+        unordered_map<string, size_t> indices;
     public:
         size_t add_name(string name);
         size_t unused_name();
@@ -17,7 +20,7 @@ class Expression {
         //virtual unique_ptr<Expression> evaluate();
         virtual unordered_set<size_t> free_vars() = 0;
         virtual void substitute(size_t target, shared_ptr<Expression> arg,
-                                shared_ptr<NameList> names) = 0;
+                                shared_ptr<Environment> names) = 0;
         virtual unique_ptr<Expression> copy() = 0;
         virtual bool is_var() = 0;
 };
@@ -34,7 +37,7 @@ class Abstraction: public Expression {
         unique_ptr<Expression> copy();
         unordered_set<size_t> free_vars();
         void substitute(size_t target, shared_ptr<Expression> arg,
-                        shared_ptr<NameList> names);
+                        shared_ptr<Environment> names);
 };
 
 class Application: public Expression {
@@ -48,7 +51,7 @@ class Application: public Expression {
         unique_ptr<Expression> copy();
         unordered_set<size_t> free_vars();
         void substitute(size_t target, shared_ptr<Expression> arg,
-                        shared_ptr<NameList> names);
+                        shared_ptr<Environment> names);
 };
 
 class Variable: public Expression {
@@ -57,9 +60,8 @@ class Variable: public Expression {
     public:
        Variable(size_t name): name(name) {}
        void substitute(size_t target, shared_ptr<Expression> arg,
-                       shared_ptr<NameList> names) { return; }
+                       shared_ptr<Environment> names) { return; }
        size_t get_name() { return name; };
        bool is_var() { return true; }
        unique_ptr<Expression> copy();
-       unordered_set<size_t> free_vars();
-};
+       unordered_set<size_t> free_vars(); };

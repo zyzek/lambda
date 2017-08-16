@@ -3,13 +3,10 @@
 
 #include "lexer.h"
 
-
 int main() {
-   
-    std::string line;
-
     std::cout << "Lambda calculus interpreter. ^D to exit." << std::endl;
 
+    std::string line;
     while (getline(std::cin, line)) {
         Lexer l(line);
         enum token t;
@@ -19,7 +16,6 @@ int main() {
             if (t == t_ident) std::cout << "(" << l.identifier() << ")";
             std::cout << " ";
         }
-
         std::cout << std::endl;
     }
 

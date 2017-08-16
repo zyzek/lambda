@@ -1,18 +1,23 @@
 #include "expression.h"
-#include <string>
 
-size_t NameList::add_name(string name) {
+size_t Environment::add_name(string name) {
+    auto index_p = indices.find(name);
+    if (index_p != indices.end()) {
+        return index_p->second;
+    }
+
+    size_t index = names.size();
     names.push_back(name);
-    return names.size() - 1;
+    indices[name] = index;
+    return index;
 }
 
-size_t NameList::unused_name() {
-    names.push_back("@" + to_string(names.size()));
-    return names.size() - 1;
+size_t Environment::unused_name() {
+    return add_name("@" + to_string(names.size()));
 }
 
 void Abstraction::substitute(size_t target, shared_ptr<Expression> arg,
-                             shared_ptr<NameList> names) {
+                             shared_ptr<Environment> names) {
     unordered_set<size_t> arg_free = arg->free_vars();
 
     // We must check if the free arguments would be bound by this binder
@@ -34,7 +39,7 @@ void Abstraction::substitute(size_t target, shared_ptr<Expression> arg,
 }
 
 void Application::substitute(size_t target, shared_ptr<Expression> arg,
-                             shared_ptr<NameList> names) {
+                             shared_ptr<Environment> names) {
     if (left->is_var() && left->free_vars().count(target)) {
         left = arg->copy();
     } else {

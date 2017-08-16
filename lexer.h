@@ -1,4 +1,8 @@
 #include <string>
+#include <utility>
+#include <vector>
+
+using namespace std;
 
 enum token {
     t_lparen,    // '('
@@ -10,15 +14,23 @@ enum token {
     t_error      // anything unrecognised
 };
 
-std::string token_string(enum token t);
+string token_string(enum token t);
 
 class Lexer {
     private:
-        std::string input;      // String currently being tokenised
-        size_t i;               // Current index into the string
-        std::string last_ident; // Last extracted identifier.
+        // Pairs of tokens and indexes into the idents vector.
+        vector<pair<enum token, ssize_t> > tokens;
+        vector<string> idents;
+
+        // Current index into the token sequence.
+        size_t token_index;
+
+        // Last identifier string
+        string last_ident;
     public:
-        Lexer(std::string input): input(input), i(0) {}
+        Lexer(string input) { tokenise(input); }
+        void tokenise(string in);
         enum token next();
-        std::string &identifier() { return last_ident; }
+        string identifier() { return last_ident; }
+        void set_index(size_t i);
 };
