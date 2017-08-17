@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <utility>
 #include <vector>
@@ -8,7 +9,7 @@ enum token {
     t_lparen,    // '('
     t_rparen,    // ')'
     t_backslash, // '\'
-    t_stop,      // '.'
+    t_dot,      // '.'
     t_ident,     // strings of characters
     t_eol,       // '\n'
     t_error      // anything unrecognised
@@ -31,6 +32,10 @@ class Lexer {
         Lexer(string input) { tokenise(input); }
         void tokenise(string in);
         enum token next();
+        enum token prev();
+        bool has_next() { return token_index < tokens.size(); }
+        bool has_prev() { return token_index > 0; }
         string identifier() { return last_ident; }
-        void set_index(size_t i);
+        void set_index(size_t i) { token_index = i; }
+        size_t get_index() { return token_index; }
 };

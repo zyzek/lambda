@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include <stdexcept>
 
 std::string token_string(enum token t) {
     switch (t) {
@@ -8,7 +9,7 @@ std::string token_string(enum token t) {
             return ")";
         case t_backslash:
             return "\\";
-        case t_stop:
+        case t_dot:
             return ".";
         case t_ident:
             return "ID";
@@ -48,7 +49,7 @@ void Lexer::tokenise(string input) {
                 tokens.push_back(make_pair(t_backslash, -1));
                 continue;
             case '.':
-                tokens.push_back(make_pair(t_stop, -1));
+                tokens.push_back(make_pair(t_dot, -1));
                 continue;
         }
 
@@ -65,15 +66,20 @@ void Lexer::tokenise(string input) {
         }
         tokens.push_back(make_pair(t_error, -1));
     }
-    tokens.push_back(make_pair(t_eol, -1));
 }
 
 enum token Lexer::next() {
+    if (token_index >= tokens.size()) return t_eol;
     pair<enum token, ssize_t> p = tokens[token_index++];
     if (p.first == t_ident) last_ident = idents[p.second];
     return p.first;
 }
 
-void Lexer::set_index(size_t i) {
-    token_index = i;
+enum token Lexer::prev() {
+    if (token_index == 0) return t_eol;
+    pair<enum token, ssize_t> p = tokens[--token_index];
+    if (p.first == t_ident) last_ident = idents[p.second];
+    return p.first;
 }
+
+
