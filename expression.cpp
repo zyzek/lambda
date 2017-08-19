@@ -91,19 +91,18 @@ unordered_set<size_t> Variable::free_vars() {
     return s;
 }
 
-/*
-void Abstraction::apply(unique_ptr<Expression> arg) {
-    unordered_set<size_t> arg_free = arg->free_vars();
+string Abstraction::str(Environment *names) {
+    return "(\\" + names->get_name(binder) + ". " + body->str(names) + ")";
+}
 
-    if (arg_free.count(binder)) {
-        // if any free variable in the argument would be bound by
-        // this abstraction, then we need to rename the binder and all
-        // occurrences it binds.
-        
-        // Rename stuff: work out how to generate this
-        string new_name = undefined;
-        body.substitute(binder, new_name
+string Application::str(Environment *names) {
+    if (dynamic_cast<Application*>(right.get())) {
+        return left->str(names) + " (" + right->str(names) + ")";
+    } else {
+        return left->str(names) + " " + right->str(names);
     }
+}
 
-
-}*/
+string Variable::str(Environment *names) {
+    return names->get_name(name);
+}

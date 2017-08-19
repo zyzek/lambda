@@ -13,6 +13,7 @@ class Environment {
     public:
         size_t add_name(string name);
         size_t unused_name();
+        string get_name(size_t i) { return names[i]; }
 };
 
 class Expression {
@@ -24,6 +25,7 @@ class Expression {
                                 shared_ptr<Environment> names) = 0;
         virtual unique_ptr<Expression> copy() = 0;
         virtual bool is_var() = 0;
+        virtual string str(Environment *names) = 0;
 };
 
 class Abstraction: public Expression {
@@ -31,7 +33,6 @@ class Abstraction: public Expression {
         size_t binder;
         unique_ptr<Expression> body;
     public:
-        //unique_ptr<Expression> apply(unique_ptr<Expression> arg);
         Abstraction(size_t binder, unique_ptr<Expression> body):
                     binder(binder), body(move(body)) {}
         bool is_var() { return false; }
@@ -39,6 +40,7 @@ class Abstraction: public Expression {
         unordered_set<size_t> free_vars();
         void substitute(size_t target, shared_ptr<Expression> arg,
                         shared_ptr<Environment> names);
+        string str(Environment *names);
 };
 
 class Application: public Expression {
@@ -53,6 +55,7 @@ class Application: public Expression {
         unordered_set<size_t> free_vars();
         void substitute(size_t target, shared_ptr<Expression> arg,
                         shared_ptr<Environment> names);
+        string str(Environment *names);
 };
 
 class Variable: public Expression {
@@ -65,4 +68,6 @@ class Variable: public Expression {
        size_t get_name() { return name; };
        bool is_var() { return true; }
        unique_ptr<Expression> copy();
-       unordered_set<size_t> free_vars(); };
+       unordered_set<size_t> free_vars();
+       string str(Environment *names);
+};

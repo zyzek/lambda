@@ -1,5 +1,4 @@
 #include "lexer.h"
-#include <stdexcept>
 
 std::string token_string(enum token t) {
     switch (t) {
@@ -82,4 +81,20 @@ enum token Lexer::prev() {
     return p.first;
 }
 
+enum token Lexer::match_next(enum token expected) {
+    enum token t = next();
+    if (t != expected) {
+        prev();
+        throw runtime_error("Expected " + token_string(expected) + ", but received " + token_string(t) + ".");
+    }
+    return t;
+}
 
+enum token Lexer::match_prev(enum token expected) {
+    enum token t = prev();
+    if (t != expected) {
+        next();
+        throw runtime_error("Expected " + token_string(expected) + ", but received " + token_string(t) + ".");
+    }
+    return t;
+}

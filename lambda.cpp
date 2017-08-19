@@ -2,23 +2,23 @@
 #include <iostream>
 
 #include "parser.h"
-#include "lexer.h"
 
 int main() {
     std::cout << "Lambda calculus interpreter. ^D to exit." << std::endl;
 
     std::string line;
     while (getline(std::cin, line)) {
-        Lexer l(line);
-        Parser p(l);
-        /*enum token t;
-
-        while ((t = l.next()) != t_eol) {
-            std::cout << token_string(t);
-            if (t == t_ident) std::cout << "(" << l.identifier() << ")";
-            std::cout << " ";
+        
+        try { 
+            Lexer l(line);
+            Parser p(l);
+            
+            unique_ptr<Expression> e = p.parse();
+            Environment names = p.get_names();
+            std::cout << e->str(&names) << std::endl;
+        } catch (...) {
+            std::cout << "Parse failed." << std::endl;
         }
-        std::cout << std::endl;*/
     }
 
     return 0;

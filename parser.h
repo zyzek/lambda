@@ -9,8 +9,6 @@ using namespace std;
  * variable := identifier
  * application := expression expression
  * abstraction := ( \ x y z . expression )
- *
- * application := expression (variable | abstraction) expression
  */
 
 class Parser {
@@ -26,6 +24,7 @@ class Parser {
         unique_ptr<Expression> parse_non_application();
         unique_ptr<Expression> parse_expression();
     public:
-        Parser(Lexer l): l(l) {}
+        Parser(Lexer l): l(l) { l.fastforward(); }
         unique_ptr<Expression> parse();
+        Environment get_names() { return names; }
 };
