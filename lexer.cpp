@@ -1,5 +1,7 @@
 #include "lexer.h"
 
+#define NA (-1)
+
 std::string token_string(enum token t) {
     switch (t) {
         case t_lparen:
@@ -39,16 +41,19 @@ void Lexer::tokenise(string input) {
         // Handle the special language characters
         switch (input[i++]) {
             case '(':
-                tokens.push_back(make_pair(t_lparen, -1));
+                tokens.push_back(make_pair(t_lparen, NA));
                 continue;
             case ')':
-                tokens.push_back(make_pair(t_rparen, -1));
+                tokens.push_back(make_pair(t_rparen, NA));
                 continue;
             case '\\':
-                tokens.push_back(make_pair(t_backslash, -1));
+                tokens.push_back(make_pair(t_backslash, NA));
                 continue;
             case '.':
-                tokens.push_back(make_pair(t_dot, -1));
+                tokens.push_back(make_pair(t_dot, NA));
+                continue;
+            case '=':
+                tokens.push_back(make_pair(t_equals, NA));
                 continue;
         }
 
@@ -63,8 +68,13 @@ void Lexer::tokenise(string input) {
             idents.push_back(ident);
             continue;
         }
-        tokens.push_back(make_pair(t_error, -1));
+        tokens.push_back(make_pair(t_error, NA));
     }
+}
+
+enum token Lexer::peek(size_t i) {
+    if (token_index >= tokens.size()) return t_eol;
+    return tokens[i].first;
 }
 
 enum token Lexer::next() {
@@ -97,4 +107,14 @@ enum token Lexer::match_prev(enum token expected) {
         throw runtime_error("Expected " + token_string(expected) + ", but received " + token_string(t) + ".");
     }
     return t;
+}
+
+string Lexer::match_next_ident() {
+    match_next(t_ident);
+    return identifier();
+}
+
+string Lexer::match_prev_ident() {
+    match_prev(t_ident);
+    return identifier();
 }

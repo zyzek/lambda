@@ -6,14 +6,23 @@
 
 using namespace std;
 
+class Expression;
+
 class Environment {
     private:
         vector<string> names;
         unordered_map<string, size_t> indices;
+        unordered_map<size_t, unique_ptr<Expression> > expressions;
     public:
         size_t add_name(string name);
         size_t unused_name();
         string get_name(size_t i) { return names[i]; }
+        bool has_expression(size_t i);
+        bool has_expression(string name);
+        unique_ptr<Expression> get_expression(size_t i);
+        unique_ptr<Expression> get_expression(string name);
+        void set_expression(size_t i, unique_ptr<Expression>& e);
+        void set_expression(string name, unique_ptr<Expression>& e);
 };
 
 class Expression {

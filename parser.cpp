@@ -2,8 +2,8 @@
 #include "parser.h"
 
 unique_ptr<Expression> Parser::parse_variable() {
-    t = l.match_prev(t_ident);
-    unique_ptr<Expression> var(new Variable(names.add_name(l.identifier())));
+    string ident = l.match_prev_ident();
+    unique_ptr<Expression> var(new Variable(names->add_name(ident)));
     return move(var);
 }
 
@@ -37,13 +37,13 @@ unique_ptr<Expression> Parser::parse_abstraction() {
     l.match_prev(t_dot);
 
     // There must be at least one binder
-    l.match_prev(t_ident);
-    body = unique_ptr<Expression>(new Abstraction(names.add_name(l.identifier()), move(body)));
+    string ident = l.match_prev_ident();
+    body = unique_ptr<Expression>(new Abstraction(names->add_name(ident), move(body)));
 
     // ...and further binders produce nested abstractions.
     try {
         while (l.match_prev(t_ident) == t_ident) {
-            body = unique_ptr<Expression>(new Abstraction(names.add_name(l.identifier()), move(body)));
+            body = unique_ptr<Expression>(new Abstraction(names->add_name(l.identifier()), move(body)));
         }
     } catch (...) {}
 
@@ -107,9 +107,32 @@ unique_ptr<Expression> Parser::parse_expression() {
     throw runtime_error("Failed to parse expression.");
 }
 
-unique_ptr<Expression> Parser::parse() {
+unique_ptr<Expression> Parser::parse_assignment() {
+    // Parse the expression being assigned.
+    auto val = parse_expression();
+
+    // Parse an equals sign, and the variable name being assigned to.
+    l.match_prev(t_equals);
+    string ident = l.match_prev_ident();
+
+    // Map the name to the expression in the environment, and return.
+    names->add_name(ident);
+    names->set_expression(ident, val);
+    return move(val);
+}
+
+unique_ptr<Expression> Parser::parse(shared_ptr<Environment> env) {
+    names = env;
+
     l.fastforward();
-    unique_ptr<Expression> p = parse_expression();
+    unique_ptr<Expression> p;
+    try {
+        parse_assignment();
+    } catch(...) {
+        l.fastforward();
+        p = parse_expression();
+    }
+
     if (l.has_prev()) throw runtime_error("Unconsumed input.");
     return move(p);
 }

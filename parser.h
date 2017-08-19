@@ -5,17 +5,11 @@
 
 using namespace std;
 
-/* expression := variable | application | abstraction | (expression)
- * variable := identifier
- * application := expression expression
- * abstraction := ( \ x y z . expression )
- */
-
 class Parser {
     private:
         Lexer l;
         token t;
-        Environment names;
+        shared_ptr<Environment> names;
 
         unique_ptr<Expression> parse_variable();
         unique_ptr<Expression> parse_application();
@@ -23,8 +17,8 @@ class Parser {
         unique_ptr<Expression> parse_parenthetical();
         unique_ptr<Expression> parse_non_application();
         unique_ptr<Expression> parse_expression();
+        unique_ptr<Expression> parse_assignment();
     public:
         Parser(Lexer l): l(l) { l.fastforward(); }
-        unique_ptr<Expression> parse();
-        Environment get_names() { return names; }
+        unique_ptr<Expression> parse(shared_ptr<Environment> env);
 };

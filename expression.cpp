@@ -23,6 +23,18 @@ size_t Environment::unused_name() {
     return add_name("@" + to_string(names.size()));
 }
 
+unique_ptr<Expression> Environment::get_expression(size_t i) { return expressions[i]->copy(); }
+
+unique_ptr<Expression> Environment::get_expression(string name) { return get_expression(indices[name]); }
+
+void Environment::set_expression(size_t i, unique_ptr<Expression>& e) { expressions[i] = e->copy(); }
+
+void Environment::set_expression(string name, unique_ptr<Expression>& e) { set_expression(indices[name], e); }
+
+bool Environment::has_expression(size_t i) { return (expressions.count(i) != 0); }
+
+bool Environment::has_expression(string name) { return has_expression(indices[name]); }
+
 
 // Define the steps that can reduce an expression to its unique (alpha-equivalent) normal form.
 

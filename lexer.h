@@ -9,8 +9,9 @@ enum token {
     t_lparen,    // '('
     t_rparen,    // ')'
     t_backslash, // '\'
-    t_dot,      // '.'
-    t_ident,     // strings of characters
+    t_dot,       // '.'
+    t_equals,    // '='
+    t_ident,     // non-keyword strings
     t_eol,       // '\n'
     t_error      // anything unrecognised
 };
@@ -30,16 +31,22 @@ class Lexer {
         string last_ident;
     public:
         Lexer(string input) { tokenise(input); }
+
         void tokenise(string in);
+
+        void set_index(size_t i) { token_index = i; }
+        size_t get_index() { return token_index; }
+        enum token peek(size_t i);
         enum token next();
         enum token prev();
         bool has_next() { return token_index < tokens.size(); }
         bool has_prev() { return token_index > 0; }
         enum token match_next(enum token expected);
         enum token match_prev(enum token expected);
+        string match_next_ident();
+        string match_prev_ident();
         void rewind() { token_index = 0; }
         void fastforward() { token_index = tokens.size(); }
+
         string identifier() { return last_ident; }
-        void set_index(size_t i) { token_index = i; }
-        size_t get_index() { return token_index; }
 };
