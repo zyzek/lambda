@@ -2,6 +2,7 @@
 
 #define NA (-1)
 
+
 std::string token_string(enum token t) {
     switch (t) {
         case t_lparen:
@@ -21,9 +22,11 @@ std::string token_string(enum token t) {
     }
 }
 
+
 bool isident(char c) {
     return isalnum(c) || c == '_';
 }
+
 
 void Lexer::tokenise(string input) {
     tokens.clear();
@@ -72,10 +75,12 @@ void Lexer::tokenise(string input) {
     }
 }
 
+
 enum token Lexer::peek(size_t i) {
     if (token_index >= tokens.size()) return t_eol;
     return tokens[i].first;
 }
+
 
 enum token Lexer::next() {
     if (token_index >= tokens.size()) return t_eol;
@@ -84,12 +89,14 @@ enum token Lexer::next() {
     return p.first;
 }
 
+
 enum token Lexer::prev() {
     if (token_index == 0) return t_eol;
     pair<enum token, ssize_t> p = tokens[--token_index];
     if (p.first == t_ident) last_ident = idents[p.second];
     return p.first;
 }
+
 
 enum token Lexer::match_next(enum token expected) {
     enum token t = next();
@@ -100,6 +107,7 @@ enum token Lexer::match_next(enum token expected) {
     return t;
 }
 
+
 enum token Lexer::match_prev(enum token expected) {
     enum token t = prev();
     if (t != expected) {
@@ -109,10 +117,12 @@ enum token Lexer::match_prev(enum token expected) {
     return t;
 }
 
+
 string Lexer::match_next_ident() {
     match_next(t_ident);
     return identifier();
 }
+
 
 string Lexer::match_prev_ident() {
     match_prev(t_ident);

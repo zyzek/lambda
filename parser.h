@@ -2,13 +2,11 @@
 #include "lexer.h"
 #include "expression.h"
 
-
 using namespace std;
 
 class Parser {
     private:
-        Lexer l;
-        token t;
+        shared_ptr<Lexer> l;
         shared_ptr<Environment> names;
 
         unique_ptr<Expression> parse_variable();
@@ -19,6 +17,21 @@ class Parser {
         unique_ptr<Expression> parse_expression();
         unique_ptr<Expression> parse_assignment();
     public:
-        Parser(Lexer l): l(l) { l.fastforward(); }
-        unique_ptr<Expression> parse(shared_ptr<Environment> env);
+        Parser(shared_ptr<Lexer> lexer = shared_ptr<Lexer>(), shared_ptr<Environment> env = shared_ptr<Environment>()) {
+            if (lexer != nullptr) {
+                l = lexer;
+            } else {
+                l = make_shared<Lexer>();
+            }
+
+            if (env != nullptr) {
+                names = env;
+            } else {
+                names = make_shared<Environment>();
+            }
+        }
+
+        shared_ptr<Lexer> get_lexer() { return l; }
+        shared_ptr<Environment> get_env() { return names; }
+        unique_ptr<Expression> parse();
 };

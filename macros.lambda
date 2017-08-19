@@ -1,0 +1,15 @@
+succ = (\n f x. f (n f x))
+add = (\m n. m succ n)
+mul = (\m n f. m (n f))
+exp = (\m n. n m)
+
+zero = (\f x. x)
+one = succ zero
+two = succ one
+three = succ two
+
+if = (\c t f. c t f)
+true = (\x y. x)
+false = (\x y. y)
+
+Y = (\f. (\x. f (x x)) (\x. f (x x)))

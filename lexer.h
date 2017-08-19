@@ -29,7 +29,9 @@ class Lexer {
 
         // Last identifier string
         string last_ident;
+
     public:
+        Lexer() {}
         Lexer(string input) { tokenise(input); }
 
         void tokenise(string in);
