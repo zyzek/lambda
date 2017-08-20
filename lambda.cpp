@@ -6,17 +6,21 @@
 
 using namespace std;
 
-/* An interpreter for the lambda calculus (enhanced with macros), which is decribed by the following grammar:
+/* An interpreter for the lambda calculus (enhanced with macros), which is described by the following grammar.
  *
  * statement := assignment | expression
  * assignment = variable = expression
  * expression := variable | application | abstraction | (expression)
  * application := expression expression
  * abstraction := (\ variable+ . expression)
+ *
+ * Application will be taken to be left-associative.
  */
 
+// TODO: Fuller church arithmetic
 // TODO: nullaries: (), (\x.)
 // TODO: apply auto, make_unique, const
+// TODO: Clean up source directory structure
 // TODO: command history
 // TODO: remove pairs in lexer
 // TODO: De Bruijn numbering.

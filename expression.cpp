@@ -23,17 +23,29 @@ size_t Environment::unused_name() {
     return add_name("@" + to_string(names.size()));
 }
 
-unique_ptr<Expression> Environment::get_expression(size_t i) { return expressions[i]->copy(); }
+unique_ptr<Expression> Environment::get_expression(size_t i) {
+    return expressions[i]->copy();
+}
 
-unique_ptr<Expression> Environment::get_expression(string name) { return get_expression(indices[name]); }
+unique_ptr<Expression> Environment::get_expression(string name) {
+    return get_expression(indices[name]);
+}
 
-void Environment::set_expression(size_t i, unique_ptr<Expression>& e) { expressions[i] = e->copy(); }
+void Environment::set_expression(size_t i, unique_ptr<Expression>& e) {
+    expressions[i] = e->copy();
+}
 
-void Environment::set_expression(string name, unique_ptr<Expression>& e) { set_expression(indices[name], e); }
+void Environment::set_expression(string name, unique_ptr<Expression>& e) {
+    set_expression(indices[name], e);
+}
 
-bool Environment::has_expression(size_t i) { return (expressions.count(i) != 0); }
+bool Environment::has_expression(size_t i) {
+    return (expressions.count(i) != 0);
+}
 
-bool Environment::has_expression(string name) { return has_expression(indices[name]); }
+bool Environment::has_expression(string name) {
+    return has_expression(indices[name]);
+}
 
 
 // Define the steps that can reduce an expression to its unique (alpha-equivalent) normal form.
@@ -50,7 +62,7 @@ unique_ptr<Expression> Application::reduce(Environment& names) {
 
     // If left expression is an abstraction, apply beta-reduction.
     if (l_red->is_abs()) {
-        // If the right hand side is an abstraction, we may need to further reduce the expression, post beta-reduction.
+        // If the right hand side is an abstraction, we may need to further reduce the expression after application.
         if (r_red->is_abs()) {
             return l_red->apply(r_red, names)->reduce(names);
         }
@@ -70,8 +82,8 @@ unique_ptr<Expression> Variable::reduce(Environment& names) {
 // where necessary in order to avoid variable capture.
 
 unique_ptr<Expression> Abstraction::substitute(size_t target, unique_ptr<Expression>& arg, Environment& names) {
-    // Before performing the actual substitution, we must check if the free arguments would be bound by this binder,
-    // and alpha-convert if it would be. We then substitute recursively into the body.
+    // Before performing the actual substitution, we must check if any free variable of the argument would be
+    // captured by this binder and alpha-convert if so. We then substitute recursively into the body.
     unordered_set<size_t> arg_free = arg->free_vars();
     if (arg_free.count(binder)) {
         size_t new_name = names.unused_name();
@@ -99,7 +111,7 @@ unique_ptr<Expression> Variable::substitute(size_t target, unique_ptr<Expression
 }
 
 
-// Apply a one expression to another. This will only have an effect if the left item is an abstraction.
+// Apply one expression to another. This will only have an effect if the left item is an abstraction.
 
 unique_ptr<Expression> Abstraction::apply(unique_ptr<Expression>& arg, Environment& names) {
     // Beta-reduction: substitute the argument into the body, and drop the binder.
@@ -122,7 +134,7 @@ unique_ptr<Expression> Variable::copy() {
 }
 
 
-// Return the set of variables which occur in a given expression which are not bound by any abstraction within it.
+// Return the set of variables which occur in a given expression, and which are not bound by any abstraction within it.
 
 unordered_set<size_t> Abstraction::free_vars() {
     // An abstraction removes the bound variable from the set of free variables in the body.
@@ -132,7 +144,7 @@ unordered_set<size_t> Abstraction::free_vars() {
 }
 
 unordered_set<size_t> Application::free_vars() {
-    // The free variables in an application are the union of the free variables in its subexpressions.
+    // The set of free variables in an application is the union of the sets of free variables in its subexpressions.
     unordered_set<size_t> left_free = left->free_vars();
     unordered_set<size_t> right_free = right->free_vars();
     right_free.insert(left_free.begin(), left_free.end());

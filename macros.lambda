@@ -1,15 +1,53 @@
+// Church Arithmetic
+
+// Natural numbers will be defined as functions that repeatedly apply their first input to their second.
+// Therefore zero, which does not apply its argument has the following definition:
+zero = (\f x. x)
+// And one:
+one  = (\f x. f x)
+
+// Let us now define the simplest arithmetic function, the successor function, which maps n to n+1.
+// Notice how it takes a number as its first argument, then unwraps its binders in order to apply
+// f once more to its body. How cute!
 succ = (\n f x. f (n f x))
-add = (\m n. m succ n)
+
+// So the naturals can be defined inductively:
+two   = succ one
+three = succ two
+four  = succ three
+
+// The successor function allows us to define addition,
+// which applies f m times to n (which is already n applications of f).
+add = (\m n f x. m f (n f x))
+// It can also be defined thus: (\m n. m succ n), which applies succ m times to n.
+
+// Multiplication, which applies a function n times, m times.
 mul = (\m n f. m (n f))
+
+// Exponentiation, which composes the base on itself n times. Quite elegant.
 exp = (\m n. n m)
 
-zero = (\f x. x)
-one = succ zero
-two = succ one
-three = succ two
+// The predecessor function, which takes n to n-1, is a little more complicated.
+pred = (\n f x. n (\g h. h (g f)) (\u. x) (\u. u))
+sub = (\m n. n pred m)
 
-if = (\c t f. c t f)
+// Boolean operations
 true = (\x y. x)
 false = (\x y. y)
+and = (\p q. p q p)
+or = (\p q. p p q)
+not = (\p a b. p b a)
+if = (\c t f. c t f)
 
+// Conditions
+mkfalse = (\f. false)
+mktrue = (\f. true)
+iszero = (\n. n mkfalse true)
+leq = (\m n. iszero (sub m n))
+eq = (\m n. and (leq m n) (leq n m))
+
+// Y combinator
 Y = (\f. (\x. f (x x)) (\x. f (x x)))
+
+// Factorial step for plugging into combinator
+fact = (\f n. if (iszero n) one (mul n (f (pred one))))
